@@ -1,0 +1,382 @@
+:root {
+    --bg-header: #49484D;
+}
+
+* {
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-size: .95em;
+}
+
+body #website {
+    display: flex;
+}
+
+.Error {
+    text-align: center;
+    color: red;
+    font-weight: normal;
+    font-size: 1em;
+}
+
+header {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    left: 0;
+    background-color: var(--bg-header);
+    color: #fff;
+    width: 220px;
+    height: 100vh;
+}
+
+header h1 {
+    font-size: 1.2em;
+}
+
+header #logo {
+    width: 100%;
+    margin: 0;
+}
+
+#logo img {
+    width: 100%;
+}
+
+header #online {
+    width: 90%;
+    margin: 8px auto;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 7px;
+    color: var(--bg-header);
+    box-shadow: 1px -1px 10px white;
+}
+
+header #online h4,
+header #online p {
+    margin: 2px;
+    padding: 3px;
+    text-align: center;
+    max-width: 100%;
+    overflow-x: scroll;
+    
+}
+
+header nav {
+    display: flex;
+    flex-direction: column;
+    margin: 40px auto;
+}
+
+header nav>span {
+    display: block;
+    padding: 10px 15px;
+    margin: 5px auto;
+    border-radius: 5px;
+    background-color: #fff
+}
+
+header nav>span a {
+    color: var(--bg-header);
+    text-decoration: none;
+    font-size: .9em;
+    font-weight: bold;
+}
+
+header #logout {
+    background-color: red;
+}
+
+header #logout a {
+    color: #fff;
+}
+
+
+
+
+main {
+    overflow-y: scroll;
+    flex: 1;
+}
+
+main #post-form {
+    border: 2px solid var(--bg-header);
+    width: fit-content;
+    max-width: 75%;
+    margin: 30vh auto;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+main #post-form .checkCategory {
+    width: fit-content;
+    margin: 15px auto;
+}
+
+.checkCategory input[type="checkbox"] {
+    display: none;
+}
+
+.checkCategory span {
+    padding: 5px 10px;
+    border: 1px solid var(--bg-header);
+}
+
+.checkCategory input[type="checkbox"]:checked~span {
+    background-color: var(--bg-header);
+    color: #fff;
+}
+
+main #post-form #area-text {
+    width: fit-content;
+    margin: 7px auto;
+}
+
+#area-text textarea {
+    resize: none;
+    padding: 3px;
+    border: none;
+    border-left: 1px solid var(--bg-header);
+    transition: 0.2s ease;
+}
+
+#area-text textarea:focus {
+    outline: none;
+    box-shadow: 1px -1px 10px silver;
+}
+
+input[type="submit"] {
+    padding: 7px 12px;
+    background-color: var(--bg-header);
+    color: #fff;
+    display: block;
+    border: none;
+}
+
+#post-form input[type="submit"] {
+    margin: 5px auto;
+}
+
+main #list-post {
+    width: 100%;
+}
+
+main #list-post .post {
+    width: 90%;
+    margin: 10px auto;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid var(--bg-header);
+}
+
+.post .hinfo p, .c .cinfo p {
+    font-weight: bold;
+    padding: 1px;
+    margin: 0;
+    font-size: .8em;
+}
+
+.post .hinfo p span, .c .cinfo span {
+    font-weight: normal;
+    color: var(--bg-header);
+}
+
+.post .hcontent ul {
+    list-style: none;
+    display: flex;
+    padding: 0;
+    margin: 7px 0;
+}
+
+.post .hcontent ul li {
+    margin: 3px;
+    padding: 5px 10px;
+    color: var(--bg-header);
+    border: 1px solid var(--bg-header);
+    user-select: none;
+    font-size: .9em;
+}
+
+.post .haction {
+    display: flex;
+}
+
+.post .like,
+.post .dislike,
+.post .comment {
+    margin: 5px;
+}
+
+.post .comment {
+    margin-top: 10px;
+}
+.post .like span,
+.post .dislike span {
+    font-size: 1em;
+}
+
+.post .comment a {
+    color: #000;
+}
+
+.post .dislike span i,
+.post .like span i,
+.post .comment a span i {
+    font-size: 1.2em;
+}
+
+main #bar-filter {
+    padding: 5px;
+    background-color: var(--bg-header);
+    color: #fff;
+}
+
+#bar-filter form {
+    border: 2px solid var(--bg-header);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#bar-filter form .checkCategory {
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 7px;
+    border: 1px solid #fff;
+}
+
+#bar-filter .checkCategory input[type="checkbox"]:checked~span {
+    background-color: #fff;
+    color: var(--bg-header);
+}
+
+#bar-filter input[type="submit"] {
+    background-color: #fff;
+    color: var(--bg-header);
+}
+
+/* Login style  */
+
+#register-login-main {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: url("img/vector-JUL-2021-67.jpg");
+    background-size: cover;
+}
+
+.form {
+    --input-focus: #49484D;
+    --font-color: beige;
+    --font-color-sub: silver;
+    --bg-color: beige;
+    --main-color: black;
+    padding: 20px;
+    background: var(--input-focus);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 20px;
+    border-radius: 5px;
+    border: 2px solid var(--main-color);
+    box-shadow: 4px 4px var(--main-color);
+    width: fit-content;
+}
+
+.title {
+    color: var(--font-color);
+    font-weight: 900;
+    font-size: 20px;
+    margin-bottom: 25px;
+}
+
+.title span {
+    color: var(--font-color-sub);
+    font-weight: 600;
+    font-size: 17px;
+}
+
+.input {
+    width: 250px;
+    height: 40px;
+    border-radius: 5px;
+    border: 2px solid var(--main-color);
+    background-color: var(--bg-color);
+    box-shadow: 4px 4px var(--main-color);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--input-focus);
+    padding: 5px 10px;
+    outline: none;
+}
+
+.input::placeholder {
+    color: var(--font-color-sub);
+    opacity: 0.8;
+}
+
+.input:focus {
+    border: 2px solid var(--input-focus);
+}
+
+.button-confirm {
+    margin: 50px auto 0 auto;
+    width: 120px;
+    height: 40px;
+    border-radius: 5px;
+    border: 2px solid var(--main-color);
+    background-color: var(--bg-color);
+    box-shadow: 4px 4px var(--main-color);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--input-focus);
+    cursor: pointer;
+} 
+
+/* le style pour la page de commentaire  */
+
+#form-comment {
+    margin: 10px;
+    display: flex;
+    justify-content: center;
+}
+#form-comment textarea {
+    display: block;
+    resize: none;
+    font-size: .9em;
+    padding: 7px 12px;
+    border-radius: 20px;
+    border: #49484D solid 1px;
+}
+
+button[type="submit"] {
+    padding: 5px;
+    border-radius: 50%;
+    background: none;
+    border: none;
+}
+
+#form-comment button {
+    display: block;
+    margin-left: 3px;
+}
+
+#comments .c {
+    width: 70%;
+    margin: 15px auto;
+    padding: 10px;
+    border-radius: 10px;
+    border-bottom: #49484D solid 2px;
+    border-left: #49484D solid 1'2022-02-14 20:02:30',px;
+}
+

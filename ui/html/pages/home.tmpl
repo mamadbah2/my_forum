@@ -1,0 +1,77 @@
+{{define "title"}}Home{{end}}
+
+{{define "main"}}
+<div id="bar-filter">
+    <form action="/" method="GET">
+        <div class="checkFilter">
+            <label for="fliked">
+                <input type="checkbox" name="filterCheck" value="Liked-Post" id="fliked">
+                <span>My Liked Posts</span>
+            </label>
+            <label for="fposted">
+                <input type="checkbox" name="filterCheck" value="Created-Post" id="fposted">
+                <span>My Created Posts</span>
+            </label>
+        </div>
+        <div class="checkCategory">
+            {{ range .Categores }}
+            <label for="{{ .Name }}">
+                <input type="checkbox" name="filterCategoryCheck" id="{{ .Name }}" value="{{ .Name }}">
+                <span>{{ .Name }}</span>
+            </label>
+            {{ end }}
+        </div>
+        <input type="submit" name="filter" value="valid">
+    </form>
+</div>
+
+<div id="list-post">
+    {{ range .PostsInfo }}
+    <div class="post" id="{{ .Post_id }}">
+        <div class="hinfo">
+            <p>Publié par : <span>{{ .Username }}</span></p>
+            <p>Date Heure UTC : <span>{{ .Creation_Date }}</span></p>
+        </div>
+        <div class="hcontent">
+            <ul>
+                {{ range .Categories }}
+                <li> {{.}} </li>
+                {{ end }}
+            </ul>
+            <p>
+                {{ .Content }}
+            </p>
+        </div>
+        <form action="\" method="post">
+            <div style="display: none;">
+                <input type="text" name="postId" value="{{.Post_id}}">
+            </div>
+            <div class="haction">
+                <div class="like">
+                    <button name="like" value="{{.LikeActualUser}}" type="submit">
+                        <span><i class="fa-regular fa-thumbs-up"></i></span>
+                    </button>
+                    <span> {{.Like_Number}} </span>
+                </div>
+                <div class="dislike">
+                    <button name="dislike" value="{{.DislikeActualUser}}" type="submit">
+                        <span><i class="fa-regular fa-thumbs-down"></i></span>
+                    </button>
+                    <span> {{.Dislike_Number}} </span>
+                </div>
+                <div class="comment">
+                    <a href="/comment?{{ .Post_id }}">
+                        <span><i class="fa-regular fa-comments"></i></span>
+                    </a>
+                    <span>{{ .Comment_Number}} </span>
+                </div>
+            </div>
+        </form>
+    </div>
+    {{ end }}
+
+    {{ if .BadRequestForm }}
+    <h5 class="Error">Désolé, nous n'avons trouvé aucun post repondant a ces critères</h5>
+    {{ end }}
+</div>
+{{end}}

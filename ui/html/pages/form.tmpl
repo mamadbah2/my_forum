@@ -1,0 +1,28 @@
+{{define "title"}}Create-Post{{end}}
+
+
+{{define "main"}}
+
+<form id="post-form" method="post" action="/create" >
+    {{if .BadRequestForm}}
+        <h5 class="Error">Veiller entrer de bonnes valeurs aux champs</h5>
+    {{end}}
+    <div class="checkCategory">
+        {{ range .Categores}}
+        <label for="{{.Name}}">
+            <input type="checkbox" name="categorCheck" value="{{.Category_id}}" id="{{.Name}}">
+            <span> {{.Name}} </span>
+        </label>
+        {{end}}
+    </div>
+    <!-- Donnee fictive pour le user id en attendant -->
+    <div style="display: none;">
+        <input type="text" name="userId" value="3">
+    </div>
+    <div id="area-text">
+        <textarea name="content" cols="70" rows="5" placeholder="Taper un post ici"></textarea>
+    </div>
+    <input type="submit" name="createPost" value="Creer">
+</form>
+
+{{end}}

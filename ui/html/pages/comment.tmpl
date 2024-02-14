@@ -1,0 +1,69 @@
+{{ define "title"}}Comment{{end}}
+
+
+{{ define "main" }}
+<div id="list-post">
+
+    {{ with .PostInfo }}
+    <div class="post" id="{{ .Post_id }}">
+        <div class="hinfo">
+            <p>Publié par : <span>{{ .Username }}</span></p>
+            <p>Date Heure UTC : <span>{{ .Creation_Date }}</span></p>
+        </div>
+        <div class="hcontent">
+            <ul>
+                {{ range .Categories }}
+                <li> {{.}} </li>
+                {{ end }}
+            </ul>
+            <p>
+                {{ .Content }}
+            </p>
+        </div>
+        <form action="/comment?{{ .Post_id }}" method="post">
+            <div style="display: none;">
+                <input type="text" name="postId" value="{{.Post_id}}">
+            </div>
+            <div class="haction">
+                <div class="like">
+                    <button name="like" value="{{.LikeActualUser}}" type="submit">
+                        <span><i class="fa-regular fa-thumbs-up"></i></span>
+                    </button>
+                    <span> {{.Like_Number}} </span>
+                </div>
+                <div class="dislike">
+                    <button name="dislike" value="{{.DislikeActualUser}}" type="submit">
+                        <span><i class="fa-regular fa-thumbs-down"></i></span>
+                    </button>
+                    <span> {{.Dislike_Number}} </span>
+                </div>
+            </div>
+        </form>
+    </div>
+    {{ end }}
+
+</div>
+
+<form action="/comment?{{.PostInfo.Post_id}}" method="post" id="form-comment">
+    <textarea name="comment" cols="70" rows="1" placeholder="Ajouter un commentaire"></textarea>
+    <button name="send-comment" type="submit">
+        <i class="fa-regular fa-paper-plane"></i>
+    </button>
+</form>
+
+<div id="comments">
+    {{ range .CommentsInfo }}
+    <div class="c" id="{{ .Comment_id }}">
+        <div class="cinfo">
+            <p>Commenté par : <span>{{ .Username }}</span></p>
+            <p>Le <span>{{ .Date_Creation }}</span></p>
+        </div>
+        <div class="ccontent">
+            <p>
+                {{ .Comment }}
+            </p>
+        </div>
+    </div>
+    {{ end }}
+</div>
+{{ end }}
