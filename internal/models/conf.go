@@ -8,4 +8,5 @@ import (
 type ConnDB struct {
 	DB *sql.DB
 }
-var ErrNoRecord = errors.New("No record")
+
+var ErrNoRecord = errors.New("NO RECORDS")

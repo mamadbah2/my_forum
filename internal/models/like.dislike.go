@@ -13,7 +13,7 @@ type LikeDislike struct {
 	Disliked       bool
 }
 
-func (m *ConnDB) getLikeDislike(likeDislikeId int) (*LikeDislike, error) {
+/* func (m *ConnDB) getLikeDislike(likeDislikeId int) (*LikeDislike, error) {
 	statement := `SELECT * FROM LikeDislike WHERE like_dislike_id=?`
 	row := m.DB.QueryRow(statement, likeDislikeId)
 	ld := &LikeDislike{}
@@ -25,7 +25,7 @@ func (m *ConnDB) getLikeDislike(likeDislikeId int) (*LikeDislike, error) {
 		return nil, err
 	}
 	return ld, nil
-}
+} */
 
 func (m *ConnDB) getLikeDislikePU(user_id int, post_id int) (*LikeDislike, error) {
 	statement := `SELECT like_dislike_id, liked, disliked FROM LikeDislike WHERE user_id=? AND post_id=?`
@@ -63,6 +63,9 @@ func (m *ConnDB) SetLike(userId int, postId int, liked bool) (int, error) {
 		statement = `UPDATE LikeDislike SET liked = FALSE WHERE user_id=? AND post_id=?`
 	}
 	result, err := m.DB.Exec(statement, userId, postId)
+	if err != nil {
+		return 0, err
+	}
 	id, err := result.LastInsertId()
 	if err != nil {
 		return 0, err
@@ -95,6 +98,9 @@ func (m *ConnDB) SetDislike(userId int, postId int, disliked bool) (int, error) 
 		statement = `UPDATE LikeDislike SET disliked = FALSE WHERE user_id=? AND post_id=?`
 	}
 	result, err := m.DB.Exec(statement, userId, postId)
+	if err != nil {
+		return 0, err
+	}
 	id, err := result.LastInsertId()
 	if err != nil {
 		return 0, err

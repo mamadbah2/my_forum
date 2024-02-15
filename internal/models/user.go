@@ -42,7 +42,7 @@ func (m *ConnDB) GetUserByMail(email string) (*User, error) {
 	return user, nil
 }
 
-func (m *ConnDB) getAllUser() ([]*User, error) {
+/* func (m *ConnDB) getAllUser() ([]*User, error) {
 
 	return nil, nil
-}
+} */
