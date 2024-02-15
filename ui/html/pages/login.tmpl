@@ -1,23 +1,21 @@
-<!DOCTYPE html>
-<html lang="en">
+{{ define "title" }}Login{{ end }}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>Login</title>
-</head>
+{{define "form"}}
+<main id="register-login-main">
+    <form class="form" method="post">
+        <div class="title">
+            Forum.01,<br>
+            <span><a href="/register">tu n'as pas de compte ?</a></span>
+            {{ if .BadRequestForm }}
+            <h5 class="Error" style="font-size: .7em;">
+                Invalid email or password
+            </h5>
+        {{end}}
+        </div>
+        <input class="input" name="email" placeholder="Email" type="email">
+        <input class="input" name="password" placeholder="Password" type="password">
+        <button class="button-confirm">Let`s go →</button>
+    </form>
 
-<body>
-    <main id="register-login-main">
-        <form class="form">
-            <div class="title">Forum.01,<br><span>sign up to continue</span></div>
-            <input class="input" name="email" placeholder="Email" type="email">
-            <input class="input" name="password" placeholder="Password" type="password">
-            <button class="button-confirm">Let`s go →</button>
-        </form>
-
-    </main>
-</body>
-
-</html>
+</main>
+{{end}}

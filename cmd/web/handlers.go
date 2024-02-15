@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"forum.01/internal/filters"
+	"forum.01/internal/utils"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +70,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 		data := &TemplateData{Categores: categories, PostsInfo: postsInfo, BadRequestForm: badRequest}
 
-		app.render(w, "home", data)
+		app.render(w, "base", "home", data)
 
 	case http.MethodPost:
 		postId := r.PostForm.Get("postId")
@@ -122,7 +124,7 @@ func (app *application) create(w http.ResponseWriter, r *http.Request) {
 		bad := r.URL.Query().Has("bad")
 		data := &TemplateData{Categores: categories, BadRequestForm: bad}
 
-		app.render(w, "form", data)
+		app.render(w, "base", "form", data)
 
 	case http.MethodPost:
 		err := r.ParseForm()
@@ -201,7 +203,7 @@ func (app *application) comment(w http.ResponseWriter, r *http.Request) {
 		}
 
 		data := &TemplateData{PostInfo: postInfo, CommentsInfo: commentsInfo}
-		app.render(w, "comment", data)
+		app.render(w, "base", "comment", data)
 
 	case http.MethodPost:
 		err := r.ParseForm()
@@ -253,4 +255,91 @@ func (app *application) comment(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusMethodNotAllowed)
 		return
 	}
+}
+
+func (app *application) login(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		bad := r.URL.Query().Has("bad")
+		data := &TemplateData{BadRequestForm: bad}
+
+		app.render(w, "baseLogRegis", "login", data)
+
+	case http.MethodPost:
+		err := r.ParseForm()
+		if err != nil {
+			app.clientError(w, http.StatusBadRequest)
+			return
+		}
+		email := r.PostForm.Get("email")
+		password := r.PostForm.Get("password")
+		if !utils.EmailValidation(email) || !utils.PasswordValidation(password) {
+			http.Redirect(w, r, "/login?bad", http.StatusSeeOther)
+			return
+		}
+
+		user, err := app.connDB.GetUserByMail(email)
+		if err != nil {
+			http.Redirect(w, r, "/login?bad", http.StatusSeeOther)
+			return
+		}
+		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+		if err != nil {
+			http.Redirect(w, r, "/login?bad", http.StatusSeeOther)
+			return
+		}
+		/*
+			Logique de creation de session ici
+		*/
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+
+	default:
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+}
+
+func (app *application) register(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		bad := r.URL.Query().Has("bad")
+		data := &TemplateData{BadRequestForm: bad}
+		app.render(w, "baseLogRegis", "register", data)
+
+	case http.MethodPost:
+		err := r.ParseForm()
+		if err != nil {
+			app.clientError(w, http.StatusBadRequest)
+			return
+		}
+
+		username := r.PostForm.Get("username")
+		email := r.PostForm.Get("email")
+		password := r.PostForm.Get("password")
+		if !utils.UsernameValidation(username) || !utils.EmailValidation(email) || !utils.PasswordValidation(password) {
+			http.Redirect(w, r, "/register?bad", http.StatusSeeOther)
+			return
+		}
+
+		encryptPass, err := bcrypt.GenerateFromPassword([]byte(password), 12)
+		if err != nil {
+			http.Redirect(w, r, "/register?bad", http.StatusSeeOther)
+			return
+		}
+		password = string(encryptPass)
+		app.connDB.SetUser(username, email, password)
+		/*
+			Logique de creation de session ici
+		*/
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+
+	default:
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+}
+
+func (app *application) logout(w http.ResponseWriter, r *http.Request) {
+
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }

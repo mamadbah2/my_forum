@@ -270,7 +270,7 @@ main #bar-filter {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: url("img/vector-JUL-2021-67.jpg");
+    background: url("../img/vector-JUL-2021-67.jpg");
     background-size: cover;
 }
 
@@ -301,9 +301,13 @@ main #bar-filter {
 }
 
 .title span {
-    color: var(--font-color-sub);
     font-weight: 600;
     font-size: 17px;
+}
+
+.title span a {
+    color: var(--font-color-sub);
+    cursor: pointer;
 }
 
 .input {

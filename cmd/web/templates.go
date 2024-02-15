@@ -23,24 +23,33 @@ func cachingTemplate() (map[string]*template.Template, error) {
 	if err != nil {
 		return nil, err
 	}
-
+	
+	var tf *template.Template
 	for _, page := range pages {
-		tf, err := template.ParseFiles(
-			"./ui/html/base.tmpl",
-			"./ui/html/portions/header.tmpl",
-			page,
-		)
+		name := filepath.Base(page)
+		if name != "login.tmpl" && name != "register.tmpl" {
+			tf, err = template.ParseFiles(
+				"./ui/html/base.tmpl",
+				"./ui/html/portions/header.tmpl",
+				page,
+			)
+		} else {
+			tf, err = template.ParseFiles(
+				"./ui/html/baseLogRegis.tmpl",
+				"./ui/html/portions/header.tmpl",
+				page,
+			)
+		}
 		if err != nil {
 			return nil, err
 		}
-		name := filepath.Base(page)
 		cache[name] = tf
 	}
 
 	return cache, nil
 }
 
-func (app *application) render(w http.ResponseWriter, page string, data *TemplateData) {
+func (app *application) render(w http.ResponseWriter,layout, page string, data *TemplateData) {
 	extention := ".tmpl"
 	tmpl, exist := app.cacheTemplate[page+extention]
 	if !exist {
@@ -49,7 +58,7 @@ func (app *application) render(w http.ResponseWriter, page string, data *Templat
 		return
 	}
 	w.WriteHeader(200)
-	err := tmpl.ExecuteTemplate(w, "base", data)
+	err := tmpl.ExecuteTemplate(w, layout, data)
 	if err != nil {
 		app.serverError(w, err)
 		return
