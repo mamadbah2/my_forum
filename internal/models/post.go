@@ -51,7 +51,7 @@ func (m *ConnDB) GetPostInfo(postId int) (*PostInfo, error) {
 	postInfo.Creation_Date = post.Creation_Date.String()
 	postInfo.Content = post.Content
 
-	user, err := m.getUser(post.User_id)
+	user, err := m.GetUser(post.User_id)
 	if err != nil {
 		return nil, err
 	}

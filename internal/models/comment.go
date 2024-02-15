@@ -76,7 +76,7 @@ func (m *ConnDB) GetCommentsInfoByPost(postId int) ([]*CommentInfo, error) {
 		commentInfo.Comment_id = comment.Comment_id
 		commentInfo.Comment = comment.Comment
 		commentInfo.Date_Creation = comment.Date_Creation.String()
-		user, err := m.getUser(comment.User_id)
+		user, err := m.GetUser(comment.User_id)
 		if err != nil {
 			return nil, err
 		}

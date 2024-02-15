@@ -5,9 +5,11 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"forum.01/internal/filters"
 	"forum.01/internal/utils"
+	"github.com/gofrs/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -16,6 +18,11 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
+	actualUser := isConnected(r)
+	if actualUser == -1 {
+		http.Redirect(w, r, "/logout", http.StatusSeeOther)
+	}
+
 	err := r.ParseForm()
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
@@ -45,7 +52,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 					}
 					if fc == "Created-Post" {
 						// Je mets actuel user en attendant de regler les sessions
-						postsInfo = filters.CreatedPostFilter(postsInfo, 3)
+						postsInfo = filters.CreatedPostFilter(postsInfo, actualUser)
 					}
 					if fc != "Created-Post" && fc != "Liked-Post" {
 						app.clientError(w, http.StatusBadRequest)
@@ -70,7 +77,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 		data := &TemplateData{Categores: categories, PostsInfo: postsInfo, BadRequestForm: badRequest}
 
-		app.render(w, "base", "home", data)
+		app.render(w, r, "base", "home", data)
 
 	case http.MethodPost:
 		postId := r.PostForm.Get("postId")
@@ -87,7 +94,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			_, err = app.connDB.SetLike(3, pId, l)
+			_, err = app.connDB.SetLike(actualUser, pId, l)
 			if err != nil {
 				app.serverError(w, err)
 			}
@@ -100,7 +107,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			_, err = app.connDB.SetDislike(3, pId, dl)
+			_, err = app.connDB.SetDislike(actualUser, pId, dl)
 			if err != nil {
 				app.serverError(w, err)
 			}
@@ -114,6 +121,12 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) create(w http.ResponseWriter, r *http.Request) {
+	actualUser := isConnected(r)
+	if actualUser == -1 {
+		http.Redirect(w, r, "/logout", http.StatusUnauthorized)
+	}
+
+	// Action selon la methode d'entrée
 	switch r.Method {
 	case http.MethodGet:
 		categories, err := app.connDB.GetAllCategory()
@@ -124,7 +137,7 @@ func (app *application) create(w http.ResponseWriter, r *http.Request) {
 		bad := r.URL.Query().Has("bad")
 		data := &TemplateData{Categores: categories, BadRequestForm: bad}
 
-		app.render(w, "base", "form", data)
+		app.render(w, r, "base", "form", data)
 
 	case http.MethodPost:
 		err := r.ParseForm()
@@ -170,6 +183,12 @@ func (app *application) create(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) comment(w http.ResponseWriter, r *http.Request) {
+	// Verification de la session
+	actualUser := isConnected(r)
+	if actualUser == -1 {
+		http.Redirect(w, r, "/logout", http.StatusUnauthorized)
+	}
+
 	// Recuperation de l'id dans l'url
 	idPostUrlVal := r.URL.Query()
 	if len(idPostUrlVal) != 1 {
@@ -203,7 +222,7 @@ func (app *application) comment(w http.ResponseWriter, r *http.Request) {
 		}
 
 		data := &TemplateData{PostInfo: postInfo, CommentsInfo: commentsInfo}
-		app.render(w, "base", "comment", data)
+		app.render(w, r, "base", "comment", data)
 
 	case http.MethodPost:
 		err := r.ParseForm()
@@ -219,7 +238,7 @@ func (app *application) comment(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			_, err = app.connDB.SetLike(3, pId, l)
+			_, err = app.connDB.SetLike(actualUser, pId, l)
 			if err != nil {
 				app.serverError(w, err)
 			}
@@ -232,7 +251,7 @@ func (app *application) comment(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			_, err = app.connDB.SetDislike(3, pId, dl)
+			_, err = app.connDB.SetDislike(actualUser, pId, dl)
 			if err != nil {
 				app.serverError(w, err)
 			}
@@ -242,7 +261,7 @@ func (app *application) comment(w http.ResponseWriter, r *http.Request) {
 			app.infoLog.Println(comment)
 			if len(comment) > 0 {
 				// je mets le user id 3 en attendant de regler les connexions
-				_, err = app.connDB.SetComment(comment, pId, 3)
+				_, err = app.connDB.SetComment(comment, pId, actualUser)
 				if err != nil {
 					app.serverError(w, err)
 					return
@@ -263,7 +282,7 @@ func (app *application) login(w http.ResponseWriter, r *http.Request) {
 		bad := r.URL.Query().Has("bad")
 		data := &TemplateData{BadRequestForm: bad}
 
-		app.render(w, "baseLogRegis", "login", data)
+		app.render(w, r, "baseLogRegis", "login", data)
 
 	case http.MethodPost:
 		err := r.ParseForm()
@@ -291,6 +310,22 @@ func (app *application) login(w http.ResponseWriter, r *http.Request) {
 		/*
 			Logique de creation de session ici
 		*/
+		u, err := uuid.NewV4()
+
+		if err != nil {
+			app.serverError(w, err)
+			return
+		}
+		cookies := http.Cookie{
+			Name:     "session_token",
+			Value:    u.String(),
+			Secure:   true,
+			Expires:  time.Now().Add(60 * time.Minute),
+			HttpOnly: true,
+		}
+		SESSION[u.String()] = user.User_id
+		http.SetCookie(w, &cookies)
+
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 
 	default:
@@ -304,7 +339,7 @@ func (app *application) register(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		bad := r.URL.Query().Has("bad")
 		data := &TemplateData{BadRequestForm: bad}
-		app.render(w, "baseLogRegis", "register", data)
+		app.render(w,r, "baseLogRegis", "register", data)
 
 	case http.MethodPost:
 		err := r.ParseForm()
@@ -327,10 +362,30 @@ func (app *application) register(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		password = string(encryptPass)
-		app.connDB.SetUser(username, email, password)
+		userId, err := app.connDB.SetUser(username, email, password)
+		if err != nil {
+			app.serverError(w, err)
+			return
+		}
 		/*
 			Logique de creation de session ici
 		*/
+		u, err := uuid.NewV4()
+
+		if err != nil {
+			app.serverError(w, err)
+			return
+		}
+		cookies := http.Cookie{
+			Name:     "session_token",
+			Value:    u.String(),
+			Secure:   true,
+			Expires:  time.Now().Add(60 * time.Minute),
+			HttpOnly: true,
+		}
+		SESSION[u.String()] = userId
+
+		http.SetCookie(w, &cookies)
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 
 	default:
@@ -340,6 +395,9 @@ func (app *application) register(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) logout(w http.ResponseWriter, r *http.Request) {
-
+	cookie, err := r.Cookie("session_token")
+	if err == nil {
+		delete(SESSION, cookie.Value)
+	}
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }

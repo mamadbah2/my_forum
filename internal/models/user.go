@@ -7,7 +7,7 @@ type User struct {
 	Password string
 }
 
-func (m *ConnDB) getUser(id int) (*User, error) {
+func (m *ConnDB) GetUser(id int) (*User, error) {
 	statement := `SELECT * FROM User WHERE user_id = ?`
 	row := m.DB.QueryRow(statement, id)
 	user := &User{}

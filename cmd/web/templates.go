@@ -11,6 +11,7 @@ import (
 
 type TemplateData struct {
 	PostInfo       *models.PostInfo
+	UserInfo       *models.User
 	CommentsInfo   []*models.CommentInfo
 	Categores      []*models.Category
 	PostsInfo      []*models.PostInfo
@@ -23,7 +24,7 @@ func cachingTemplate() (map[string]*template.Template, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	var tf *template.Template
 	for _, page := range pages {
 		name := filepath.Base(page)
@@ -49,7 +50,8 @@ func cachingTemplate() (map[string]*template.Template, error) {
 	return cache, nil
 }
 
-func (app *application) render(w http.ResponseWriter,layout, page string, data *TemplateData) {
+func (app *application) render(w http.ResponseWriter, r *http.Request, layout, page string, data *TemplateData) {
+	var err error
 	extention := ".tmpl"
 	tmpl, exist := app.cacheTemplate[page+extention]
 	if !exist {
@@ -58,7 +60,17 @@ func (app *application) render(w http.ResponseWriter,layout, page string, data *
 		return
 	}
 	w.WriteHeader(200)
-	err := tmpl.ExecuteTemplate(w, layout, data)
+	//Comme que tout le temps on a le meme user
+	if layout == "base" {
+		userInfo, err := app.connDB.GetUser(isConnected(r))
+		if err != nil {
+			app.serverError(w, err)
+			return
+		}
+		data.UserInfo = userInfo
+	}
+
+	err = tmpl.ExecuteTemplate(w, layout, data)
 	if err != nil {
 		app.serverError(w, err)
 		return

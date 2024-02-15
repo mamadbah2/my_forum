@@ -26,6 +26,10 @@ func (app *application) panicRecover(next http.Handler) http.Handler {
 	})
 }
 
+/* func (app *application) IsConnected(next http.Handler) http.Handler {
+
+} */
+
 /* func (app *application) choiceHandler(nextA, nextB http.HandlerFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
