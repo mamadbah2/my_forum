@@ -16,6 +16,7 @@ type application struct {
 	infoLog       *log.Logger
 	errorLog      *log.Logger
 	connDB        *models.ConnDB
+	Session       map[string]int
 	cacheTemplate map[string]*template.Template
 }
 
@@ -43,11 +44,12 @@ func main() {
 		errorLog.Fatalln("Open DB error\t", err.Error())
 		return
 	}
-
+	session := make(map[string]int)
 	app := &application{
-		infoLog:       infoLog,
-		errorLog:      errorLog,
-		connDB:        &models.ConnDB{DB: db},
+		infoLog:  infoLog,
+		errorLog: errorLog,
+		connDB:   &models.ConnDB{DB: db},
+		Session:  session,
 	}
 
 	err = app.createTable()
@@ -56,14 +58,14 @@ func main() {
 		return
 	}
 	infoLog.Println("<<Successfully>> Creation Table")
-	
+
 	err = app.setData()
 	if err != nil {
 		errorLog.Fatal("Sql set data error --->", err.Error())
 		return
 	}
 	infoLog.Println("<<Successfully>> Set Data")
-	
+
 	cache, err := cachingTemplate()
 	if err != nil {
 		errorLog.Fatalln("caching Template error\t", err.Error())
@@ -75,7 +77,7 @@ func main() {
 		Handler:  app.routes(),
 		ErrorLog: errorLog,
 	}
-	
+
 	infoLog.Printf("server on http://localhost%s", *PORT)
 	err = srv.ListenAndServe()
 	errorLog.Fatalln(err.Error())

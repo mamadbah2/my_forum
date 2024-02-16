@@ -18,12 +18,14 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
-	actualUser := isConnected(r)
-	if actualUser == -1 {
-		http.Redirect(w, r, "/logout", http.StatusSeeOther)
+	// Verification de la session
+	var disconnected bool
+	actualUser, err := app.validSession(r)
+	if err != nil {
+		disconnected = true
 	}
 
-	err := r.ParseForm()
+	err = r.ParseForm()
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 		return
@@ -75,7 +77,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 		}
 
-		data := &TemplateData{Categores: categories, PostsInfo: postsInfo, BadRequestForm: badRequest}
+		data := &TemplateData{Categores: categories, PostsInfo: postsInfo, BadRequestForm: badRequest, Disconnected: disconnected}
 
 		app.render(w, r, "base", "home", data)
 
@@ -121,9 +123,10 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) create(w http.ResponseWriter, r *http.Request) {
-	actualUser := isConnected(r)
-	if actualUser == -1 {
-		http.Redirect(w, r, "/logout", http.StatusUnauthorized)
+	_, err := app.validSession(r)
+	if err != nil {
+		http.Redirect(w, r, "/logout", http.StatusSeeOther)
+		return
 	}
 
 	// Action selon la methode d'entrée
@@ -184,9 +187,10 @@ func (app *application) create(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) comment(w http.ResponseWriter, r *http.Request) {
 	// Verification de la session
-	actualUser := isConnected(r)
-	if actualUser == -1 {
-		http.Redirect(w, r, "/logout", http.StatusUnauthorized)
+	actualUser, err := app.validSession(r)
+	var disconnected bool
+	if err != nil {
+		disconnected = true
 	}
 
 	// Recuperation de l'id dans l'url
@@ -197,7 +201,6 @@ func (app *application) comment(w http.ResponseWriter, r *http.Request) {
 	}
 	var (
 		pId int
-		err error
 	)
 	for key := range idPostUrlVal {
 		pId, err = strconv.Atoi(key)
@@ -221,7 +224,7 @@ func (app *application) comment(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		data := &TemplateData{PostInfo: postInfo, CommentsInfo: commentsInfo}
+		data := &TemplateData{PostInfo: postInfo, CommentsInfo: commentsInfo, Disconnected: disconnected}
 		app.render(w, r, "base", "comment", data)
 
 	case http.MethodPost:
@@ -258,7 +261,6 @@ func (app *application) comment(w http.ResponseWriter, r *http.Request) {
 		}
 		if r.PostForm.Has("send-comment") {
 			comment := r.PostForm.Get("comment")
-			app.infoLog.Println(comment)
 			if len(comment) > 0 {
 				// je mets le user id 3 en attendant de regler les connexions
 				_, err = app.connDB.SetComment(comment, pId, actualUser)
@@ -323,7 +325,7 @@ func (app *application) login(w http.ResponseWriter, r *http.Request) {
 			Expires:  time.Now().Add(60 * time.Minute),
 			HttpOnly: true,
 		}
-		SESSION[u.String()] = user.User_id
+		app.Session[u.String()] = user.User_id
 		http.SetCookie(w, &cookies)
 
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -335,11 +337,12 @@ func (app *application) login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) register(w http.ResponseWriter, r *http.Request) {
+
 	switch r.Method {
 	case http.MethodGet:
 		bad := r.URL.Query().Has("bad")
 		data := &TemplateData{BadRequestForm: bad}
-		app.render(w,r, "baseLogRegis", "register", data)
+		app.render(w, r, "baseLogRegis", "register", data)
 
 	case http.MethodPost:
 		err := r.ParseForm()
@@ -383,7 +386,7 @@ func (app *application) register(w http.ResponseWriter, r *http.Request) {
 			Expires:  time.Now().Add(60 * time.Minute),
 			HttpOnly: true,
 		}
-		SESSION[u.String()] = userId
+		app.Session[u.String()] = userId
 
 		http.SetCookie(w, &cookies)
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -397,7 +400,7 @@ func (app *application) register(w http.ResponseWriter, r *http.Request) {
 func (app *application) logout(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session_token")
 	if err == nil {
-		delete(SESSION, cookie.Value)
+		delete(app.Session, cookie.Value)
 	}
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }

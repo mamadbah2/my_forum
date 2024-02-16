@@ -15,6 +15,7 @@ type TemplateData struct {
 	CommentsInfo   []*models.CommentInfo
 	Categores      []*models.Category
 	PostsInfo      []*models.PostInfo
+	Disconnected      bool
 	BadRequestForm bool
 }
 
@@ -62,12 +63,15 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, layout, p
 	w.WriteHeader(200)
 	//Comme que tout le temps on a le meme user
 	if layout == "base" {
-		userInfo, err := app.connDB.GetUser(isConnected(r))
-		if err != nil {
-			app.serverError(w, err)
-			return
+		userId, err := app.validSession(r)
+		if err == nil {
+			userInfo, err := app.connDB.GetUser(userId)
+			if err != nil {
+				app.serverError(w, err)
+				return
+			}
+			data.UserInfo = userInfo
 		}
-		data.UserInfo = userInfo
 	}
 
 	err = tmpl.ExecuteTemplate(w, layout, data)

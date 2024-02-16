@@ -1,28 +1,34 @@
 {{define "title"}}Home{{end}}
 
+
 {{define "main"}}
+{{$Disconnected := .Disconnected}}
 <div id="bar-filter">
-    <form action="/" method="GET">
-        <div class="checkFilter">
-            <label for="fliked">
-                <input type="checkbox" name="filterCheck" value="Liked-Post" id="fliked">
-                <span>My Liked Posts</span>
-            </label>
-            <label for="fposted">
-                <input type="checkbox" name="filterCheck" value="Created-Post" id="fposted">
-                <span>My Created Posts</span>
-            </label>
-        </div>
-        <div class="checkCategory">
-            {{ range .Categores }}
-            <label for="{{ .Name }}">
-                <input type="checkbox" name="filterCategoryCheck" id="{{ .Name }}" value="{{ .Name }}">
-                <span>{{ .Name }}</span>
-            </label>
-            {{ end }}
-        </div>
-        <input type="submit" name="filter" value="valid">
-    </form>
+    {{ if .Disconnected }}
+    <form action="/logout" method="GET">
+        {{ else }}
+        <form action="/" method="GET">
+            {{end}}
+            <div class="checkFilter">
+                <label for="fliked">
+                    <input type="checkbox" name="filterCheck" value="Liked-Post" id="fliked">
+                    <span>My Liked Posts</span>
+                </label>
+                <label for="fposted">
+                    <input type="checkbox" name="filterCheck" value="Created-Post" id="fposted">
+                    <span>My Created Posts</span>
+                </label>
+            </div>
+            <div class="checkCategory">
+                {{ range .Categores }}
+                <label for="{{ .Name }}">
+                    <input type="checkbox" name="filterCategoryCheck" id="{{ .Name }}" value="{{ .Name }}">
+                    <span>{{ .Name }}</span>
+                </label>
+                {{ end }}
+            </div>
+            <input type="submit" name="filter" value="valid">
+        </form>
 </div>
 
 <div id="list-post">
@@ -42,36 +48,40 @@
                 {{ .Content }}
             </p>
         </div>
-        <form action="\" method="post">
-            <div style="display: none;">
-                <input type="text" name="postId" value="{{.Post_id}}">
-            </div>
-            <div class="haction">
-                <div class="like">
-                    <button name="like" value="{{.LikeActualUser}}" type="submit">
-                        <span><i class="fa-regular fa-thumbs-up"></i></span>
-                    </button>
-                    <span> {{.Like_Number}} </span>
+        {{ if $Disconnected }}
+        <form action="\logout" method="get">
+            {{ else }}
+            <form action="\" method="post">
+                {{end}}
+                <div style="display: none;">
+                    <input type="text" name="postId" value="{{.Post_id}}">
                 </div>
-                <div class="dislike">
-                    <button name="dislike" value="{{.DislikeActualUser}}" type="submit">
-                        <span><i class="fa-regular fa-thumbs-down"></i></span>
-                    </button>
-                    <span> {{.Dislike_Number}} </span>
+                <div class="haction">
+                    <div class="like">
+                        <button name="like" value="{{.LikeActualUser}}" type="submit">
+                            <span><i class="fa-regular fa-thumbs-up"></i></span>
+                        </button>
+                        <span> {{.Like_Number}} </span>
+                    </div>
+                    <div class="dislike">
+                        <button name="dislike" value="{{.DislikeActualUser}}" type="submit">
+                            <span><i class="fa-regular fa-thumbs-down"></i></span>
+                        </button>
+                        <span> {{.Dislike_Number}} </span>
+                    </div>
+                    <div class="comment">
+                        <a href="/comment?{{ .Post_id }}">
+                            <span><i class="fa-regular fa-comments"></i></span>
+                        </a>
+                        <span>{{ .Comment_Number}} </span>
+                    </div>
                 </div>
-                <div class="comment">
-                    <a href="/comment?{{ .Post_id }}">
-                        <span><i class="fa-regular fa-comments"></i></span>
-                    </a>
-                    <span>{{ .Comment_Number}} </span>
-                </div>
-            </div>
-        </form>
+            </form>
     </div>
     {{ end }}
 
     {{ if .BadRequestForm }}
-    <h5 class="Error">Désolé, nous n'avons trouvé aucun post repondant a ces critères</h5>
+    <h5 class="Error">Désolé, nous n'avons trouvé aucun post repondant a ce(s) critère(s)</h5>
     {{ end }}
 </div>
 {{end}}

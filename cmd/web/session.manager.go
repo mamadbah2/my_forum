@@ -1,35 +1,35 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 )
 
-var SESSION map[string]int
-
-func isConnected(r *http.Request) (int) {
+func (app *application) validSession(r *http.Request) (int, error) {
 	cookie, err := r.Cookie("session_token")
 	if err != nil {
-		return -1
+		return 0, err
 	}
-	if cookie.Value == ""{
-		return -1
+	if cookie.Value == "" {
+		return 0, fmt.Errorf("validSession() : cookie don't contain value")
 	}
-	userId, exist := SESSION[cookie.Value]
+	userId, exist := app.Session[cookie.Value]
 	if !exist {
-		return -1
+		return 0, fmt.Errorf("validSession() :cookie value not found in session map")
 	}
-	// verify if the user didn't logged in 
+
+	// verify if the user didn't logged in
 	// on another browser
-	for key, sess := range SESSION{
-		if sess == userId && key != cookie.Value{
-			delete(SESSION,key)
+	for key, sess := range app.Session {
+		if sess == userId && key != cookie.Value {
+			delete(app.Session, key)
 		}
 	}
 	// verify if the cookie didn't expire
-	if cookie.Expires.Before(time.Now()){
-		delete(SESSION,cookie.Value)
-		return -1
+	if cookie.Expires.After(time.Now()) {
+		delete(app.Session, cookie.Value)
+		return 0, fmt.Errorf("cookie expire")
 	}
-	return userId
+	return userId, nil
 }

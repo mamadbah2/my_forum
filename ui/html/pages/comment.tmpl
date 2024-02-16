@@ -2,6 +2,7 @@
 
 
 {{ define "main" }}
+{{ $Disconnected := .Disconnected }}
 <div id="list-post">
 
     {{ with .PostInfo }}
@@ -20,50 +21,58 @@
                 {{ .Content }}
             </p>
         </div>
-        <form action="/comment?{{ .Post_id }}" method="post">
-            <div style="display: none;">
-                <input type="text" name="postId" value="{{.Post_id}}">
-            </div>
-            <div class="haction">
-                <div class="like">
-                    <button name="like" value="{{.LikeActualUser}}" type="submit">
-                        <span><i class="fa-regular fa-thumbs-up"></i></span>
-                    </button>
-                    <span> {{.Like_Number}} </span>
+        {{ if $Disconnected }}
+        <form action="/logout" method="get">
+            {{ else }}
+            <form action="/comment?{{ .Post_id }}" method="post">
+                {{end}}
+                <div style="display: none;">
+                    <input type="text" name="postId" value="{{.Post_id}}">
                 </div>
-                <div class="dislike">
-                    <button name="dislike" value="{{.DislikeActualUser}}" type="submit">
-                        <span><i class="fa-regular fa-thumbs-down"></i></span>
-                    </button>
-                    <span> {{.Dislike_Number}} </span>
+                <div class="haction">
+                    <div class="like">
+                        <button name="like" value="{{.LikeActualUser}}" type="submit">
+                            <span><i class="fa-regular fa-thumbs-up"></i></span>
+                        </button>
+                        <span> {{.Like_Number}} </span>
+                    </div>
+                    <div class="dislike">
+                        <button name="dislike" value="{{.DislikeActualUser}}" type="submit">
+                            <span><i class="fa-regular fa-thumbs-down"></i></span>
+                        </button>
+                        <span> {{.Dislike_Number}} </span>
+                    </div>
                 </div>
-            </div>
-        </form>
+            </form>
     </div>
     {{ end }}
 
 </div>
 
-<form action="/comment?{{.PostInfo.Post_id}}" method="post" id="form-comment">
-    <textarea name="comment" cols="70" rows="1" placeholder="Ajouter un commentaire"></textarea>
-    <button name="send-comment" type="submit">
-        <i class="fa-regular fa-paper-plane"></i>
-    </button>
-</form>
+{{ if .Disconnected }}
+<form action="/logout" method="get" id="form-comment">
+    {{ else }}
+    <form action="/comment?{{.PostInfo.Post_id}}" method="post" id="form-comment">
+        {{end}}
+        <textarea name="comment" cols="70" rows="1" placeholder="Ajouter un commentaire"></textarea>
+        <button name="send-comment" type="submit">
+            <i class="fa-regular fa-paper-plane"></i>
+        </button>
+    </form>
 
-<div id="comments">
-    {{ range .CommentsInfo }}
-    <div class="c" id="{{ .Comment_id }}">
-        <div class="cinfo">
-            <p>Commenté par : <span>{{ .Username }}</span></p>
-            <p>Le <span>{{ .Date_Creation }}</span></p>
+    <div id="comments">
+        {{ range .CommentsInfo }}
+        <div class="c" id="{{ .Comment_id }}">
+            <div class="cinfo">
+                <p>Commenté par : <span>{{ .Username }}</span></p>
+                <p>Le <span>{{ .Date_Creation }}</span></p>
+            </div>
+            <div class="ccontent">
+                <p>
+                    {{ .Comment }}
+                </p>
+            </div>
         </div>
-        <div class="ccontent">
-            <p>
-                {{ .Comment }}
-            </p>
-        </div>
+        {{ end }}
     </div>
     {{ end }}
-</div>
-{{ end }}

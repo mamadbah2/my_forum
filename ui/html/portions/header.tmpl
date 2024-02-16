@@ -3,8 +3,14 @@
     <img src="/static/img/forum_logo.gif" alt="logo">
 </div>
 <div id="online">
-    <h4>mamadbah</h4>
-    <p>bahmamadoubobosewa@gmail.com</p>
+    {{ if .Disconnected }}
+    <h4>Bienvenue </h4>
+    <p>Connectez-vous </p>
+    {{ else }}
+    <h4>{{ .UserInfo.Username }} </h4>
+    <p>{{ .UserInfo.Email }} </p>
+    {{end}}
+
 </div>
 <nav>
     <span>
@@ -14,7 +20,11 @@
         <a href="/">Liste Postes</a>
     </span>
     <span id="logout">
+        {{ if .Disconnected }}
+        <a href="/login">Login</a>
+        {{ else }}
         <a href="/logout">Logout</a>
+        {{end}}
     </span>
 </nav>
 {{end}}
