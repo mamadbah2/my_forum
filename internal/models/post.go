@@ -38,7 +38,7 @@ func (m *ConnDB) getPost(postId int) (*Post, error) {
 	return p, nil
 }
 
-func (m *ConnDB) GetPostInfo(postId int) (*PostInfo, error) {
+func (m *ConnDB) GetPostInfo(postId, actualUserId int) (*PostInfo, error) {
 	postInfo := &PostInfo{}
 	post, err := m.getPost(postId)
 	if err != nil {
@@ -83,9 +83,7 @@ func (m *ConnDB) GetPostInfo(postId int) (*PostInfo, error) {
 	}
 	postInfo.Comment_Number = counterComment
 
-	// J'ai mis 3 comme id du user qui est actuellement
-	//  connecté ceci en attendant de regler les sessions et tout
-	likdislik, err := m.getLikeDislikePU(3, post.Post_id)
+	likdislik, err := m.getLikeDislikePU(actualUserId, post.Post_id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			postInfo.LikeActualUser = false
@@ -133,7 +131,7 @@ func (m *ConnDB) GetAllPost() ([]*Post, error) {
 	return posts, nil
 }
 
-func (m *ConnDB) GetAllPostInfo() ([]*PostInfo, error) {
+func (m *ConnDB) GetAllPostInfo(actualUserId int) ([]*PostInfo, error) {
 	posts, err := m.GetAllPost()
 	postsInfo := []*PostInfo{}
 	if err != nil {
@@ -141,7 +139,7 @@ func (m *ConnDB) GetAllPostInfo() ([]*PostInfo, error) {
 	}
 
 	for _, post := range posts {
-		postInfo, err := m.GetPostInfo(post.Post_id)
+		postInfo, err := m.GetPostInfo(post.Post_id, actualUserId)
 		if err != nil {
 			return nil, err
 		}

@@ -1,8 +1,8 @@
 -- Création de la table User
 CREATE TABLE IF NOT EXISTS User (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username VARCHAR(255),
-    email VARCHAR(255),
+    username VARCHAR(255) UNIQUE,
+    email VARCHAR(255) UNIQUE,
     `password` VARCHAR(255)
 );
 

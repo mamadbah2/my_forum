@@ -33,7 +33,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-		postsInfo, err := app.connDB.GetAllPostInfo()
+		postsInfo, err := app.connDB.GetAllPostInfo(actualUser)
 		if err != nil {
 			app.serverError(w, err)
 			return
@@ -53,7 +53,6 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 						postsInfo = filters.LikedPostFilter(postsInfo)
 					}
 					if fc == "Created-Post" {
-						// Je mets actuel user en attendant de regler les sessions
 						postsInfo = filters.CreatedPostFilter(postsInfo, actualUser)
 					}
 					if fc != "Created-Post" && fc != "Liked-Post" {
@@ -123,7 +122,7 @@ func (app *application) home(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) create(w http.ResponseWriter, r *http.Request) {
-	_, err := app.validSession(r)
+	actualUser, err := app.validSession(r)
 	if err != nil {
 		http.Redirect(w, r, "/logout", http.StatusSeeOther)
 		return
@@ -153,13 +152,7 @@ func (app *application) create(w http.ResponseWriter, r *http.Request) {
 		// la fonction retourne une boolean si donne bonne ou pas
 		categoryIds := r.Form["categorCheck"]
 		content := r.PostForm.Get("content")
-		userId, err := strconv.Atoi(r.PostForm.Get("userId"))
-		if len(categoryIds) == 0 || content == "" || err != nil {
-			// app.clientError(w, http.StatusBadRequest)
-			http.Redirect(w, r, "/create?bad", http.StatusSeeOther)
-			return
-		}
-		lastPostId, err := app.connDB.SetPost(content, userId)
+		lastPostId, err := app.connDB.SetPost(content, actualUser)
 		if err != nil {
 			app.serverError(w, err)
 			return
@@ -212,7 +205,7 @@ func (app *application) comment(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-		postInfo, err := app.connDB.GetPostInfo(pId)
+		postInfo, err := app.connDB.GetPostInfo(pId, actualUser)
 		if err != nil {
 			app.serverError(w, err)
 			return
@@ -262,7 +255,6 @@ func (app *application) comment(w http.ResponseWriter, r *http.Request) {
 		if r.PostForm.Has("send-comment") {
 			comment := r.PostForm.Get("comment")
 			if len(comment) > 0 {
-				// je mets le user id 3 en attendant de regler les connexions
 				_, err = app.connDB.SetComment(comment, pId, actualUser)
 				if err != nil {
 					app.serverError(w, err)
@@ -367,6 +359,10 @@ func (app *application) register(w http.ResponseWriter, r *http.Request) {
 		password = string(encryptPass)
 		userId, err := app.connDB.SetUser(username, email, password)
 		if err != nil {
+			if err.Error() == "UNIQUE constraint failed: User.username" {
+				http.Redirect(w, r, "/register?bad", http.StatusSeeOther)
+				return
+			}
 			app.serverError(w, err)
 			return
 		}
