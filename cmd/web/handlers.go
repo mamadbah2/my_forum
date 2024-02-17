@@ -157,6 +157,10 @@ func (app *application) create(w http.ResponseWriter, r *http.Request) {
 			app.serverError(w, err)
 			return
 		}
+		if len(categoryIds) == 0 {
+			http.Redirect(w, r, "/create?bad", http.StatusSeeOther)
+			return
+		}
 		for _, categoryId := range categoryIds {
 			cId, err := strconv.Atoi(strings.TrimSpace(categoryId))
 			if err != nil {
