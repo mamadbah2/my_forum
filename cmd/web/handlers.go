@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html"
 	"net/http"
 	"strconv"
 	"strings"
@@ -15,7 +16,7 @@ import (
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		app.notFound(w)
+		app.notFound(w, r)
 		return
 	}
 	// Verification de la session
@@ -152,17 +153,18 @@ func (app *application) create(w http.ResponseWriter, r *http.Request) {
 		// la fonction retourne une boolean si donne bonne ou pas
 		categoryIds := r.Form["categorCheck"]
 		content := r.PostForm.Get("content")
-		if len(categoryIds) == 0 || strings.TrimSpace(content) == "" {
+		escapedContent := html.EscapeString(content)
+
+		if len(categoryIds) == 0 || strings.TrimSpace(escapedContent) == "" {
 			http.Redirect(w, r, "/create?bad", http.StatusSeeOther)
 			return
 		}
-
-		lastPostId, err := app.connDB.SetPost(content, actualUser)
+		lastPostId, err := app.connDB.SetPost(escapedContent, actualUser)
 		if err != nil {
 			app.serverError(w, err)
 			return
 		}
-		
+
 		for _, categoryId := range categoryIds {
 			cId, err := strconv.Atoi(strings.TrimSpace(categoryId))
 			if err != nil {
@@ -260,8 +262,9 @@ func (app *application) comment(w http.ResponseWriter, r *http.Request) {
 		}
 		if r.PostForm.Has("send-comment") {
 			comment := r.PostForm.Get("comment")
-			if len(comment) > 0 {
-				_, err = app.connDB.SetComment(comment, pId, actualUser)
+			escapedComment := html.EscapeString(comment)
+			if len(escapedComment) > 0 {
+				_, err = app.connDB.SetComment(escapedComment, pId, actualUser)
 				if err != nil {
 					app.serverError(w, err)
 					return

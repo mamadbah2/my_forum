@@ -15,7 +15,7 @@ type TemplateData struct {
 	CommentsInfo   []*models.CommentInfo
 	Categores      []*models.Category
 	PostsInfo      []*models.PostInfo
-	Disconnected      bool
+	Disconnected   bool
 	BadRequestForm bool
 }
 
@@ -29,7 +29,7 @@ func cachingTemplate() (map[string]*template.Template, error) {
 	var tf *template.Template
 	for _, page := range pages {
 		name := filepath.Base(page)
-		if name != "login.tmpl" && name != "register.tmpl" {
+		if name != "login.tmpl" && name != "register.tmpl" && name != "error.tmpl" {
 			tf, err = template.ParseFiles(
 				"./ui/html/base.tmpl",
 				"./ui/html/portions/header.tmpl",
@@ -61,7 +61,7 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, layout, p
 		return
 	}
 	w.WriteHeader(200)
-	
+
 	//Comme que tout le temps on a le meme user
 	if layout == "base" {
 		userId, err := app.validSession(r)
@@ -85,7 +85,6 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, layout, p
 			data.UserInfo = userInfo
 		}
 	}
-
 	err = tmpl.ExecuteTemplate(w, layout, data)
 	if err != nil {
 		app.serverError(w, err)

@@ -144,6 +144,29 @@ main {
     background: url("/static/img/mainbg.jpeg") fixed;
 }
 
+main #webError {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+main #webError pre {
+    padding: 10px;
+    width: fit-content;
+    backdrop-filter: blur(2px);
+    margin: auto;
+    border: 3px solid #49484D;
+    border-radius: 20px;
+}
+main #webError h1 {
+    font-size: 10em;
+    text-align: center;
+    text-shadow: 1px -1px 10px #49484D;
+    letter-spacing: 10px;
+}
+
 main #post-form {
     border: 3px solid var(--bg-header);
     width: 90%;
