@@ -13,6 +13,10 @@ body {
     font-size: .95em;
 }
 
+a {
+    text-decoration: none;
+}
+
 body #website {
     display: flex;
 }
@@ -22,6 +26,30 @@ body #website {
     color: red;
     font-weight: normal;
     font-size: 1em;
+}
+
+#website > section  {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    right: 0;
+    background-color: var(--bg-header);
+    color: #fff;
+    text-align: right;
+    width: 200px;
+    height: 100vh;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+#website > section div {
+    padding: 10px;
+    text-align: center;
+    box-shadow: 1px -1px 10px #fff;
+}
+#website > section div p {
+    font-size: .9em;
 }
 
 header {
@@ -51,21 +79,31 @@ header #logo {
 header #online {
     width: 90%;
     margin: 8px auto;
-    padding: 10px;
-    background-color: #fff;
+    padding: 15px 10px;
+    /* background-color: #fff; */
     border-radius: 7px;
-    color: var(--bg-header);
+    /* color: var(--bg-header); */
     box-shadow: 1px -1px 10px white;
+    
+}
+
+header #online p {
+    padding: 3px;
+    overflow-x: scroll ;   
+}
+
+header #online h4 {
+    padding: 0;
 }
 
 header #online h4,
 header #online p {
     margin: 2px;
-    padding: 3px;
     text-align: center;
-    max-width: 100%;
-    overflow-x: scroll;
-    
+}
+
+header #online .connected {
+    color: rgb(8, 191, 8);
 }
 
 header nav {
@@ -103,6 +141,7 @@ header #logout a {
 main {
     overflow-y: scroll;
     flex: 1;
+    background: url("/static/img/mainbg.jpeg") fixed;
 }
 
 main #post-form {
@@ -112,11 +151,14 @@ main #post-form {
     margin: 20vh auto;
     padding: 10px;
     border-radius: 5px;
+    background-color: #fff;
 }
 
 main #post-form .checkCategory {
     width: fit-content;
-    margin: 15px auto;
+    margin: 5px auto;
+    background-color: #fff;
+    padding: 15px;
 }
 
 .checkCategory input[type="checkbox"] {
@@ -161,10 +203,9 @@ input[type="submit"] {
     border: none;
 }
 
-
 #post-form input[type="submit"] {
-    margin: 5px auto;
     width: 95%;
+    margin: 5px auto;
 }
 
 main #list-post {
@@ -177,6 +218,11 @@ main #list-post .post {
     padding: 10px;
     border-radius: 10px;
     border: 1px solid var(--bg-header);
+    background-color: #fff;
+}
+
+main #list-post .Error {
+    background-color: #fff;
 }
 
 .post .hinfo p, .c .cinfo p {
@@ -213,26 +259,24 @@ main #list-post .post {
 
 .post .like,
 .post .dislike,
-.post .comment {
+.post .comment a {
     margin: 5px;
 }
-
-.post .comment {
-    margin-top: 10px;
+.post .comment a  {
+    display: inline-block;
+    color: #000;
+    padding-top: 5px;
 }
+
 .post .like span,
 .post .dislike span {
     font-size: 1em;
 }
 
-.post .comment a {
-    color: #000;
-}
-
 .post .dislike span i,
 .post .like span i,
 .post .comment a span i {
-    font-size: 1.2em;
+    font-size: 1.5em;
 }
 
 main #bar-filter {
@@ -242,6 +286,8 @@ main #bar-filter {
 }
 
 #bar-filter form {
+    max-width: 750px;
+    margin: auto;
     border: 2px solid var(--bg-header);
     display: flex;
     align-items: center;
@@ -274,7 +320,7 @@ main #bar-filter {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: url("../img/vector-JUL-2021-67.jpg");
+    background: url("/static/img/vector-JUL-2021-67.jpg");
     background-size: cover;
 }
 
@@ -305,13 +351,14 @@ main #bar-filter {
 }
 
 .title span {
+    color: var(--font-color-sub);
     font-weight: 600;
     font-size: 17px;
 }
 
 .title span a {
-    color: var(--font-color-sub);
-    cursor: pointer;
+    color : silver;
+    text-decoration: underline;
 }
 
 .input {
@@ -385,6 +432,11 @@ button[type="submit"] {
     padding: 10px;
     border-radius: 10px;
     border-bottom: #49484D solid 2px;
-    border-left: #49484D solid 1'2022-02-14 20:02:30',px;
+    border-left: #49484D solid 1px;
+    background-color: #fff;
 }
+
+
+
+
 

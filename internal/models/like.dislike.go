@@ -129,3 +129,14 @@ func (m *ConnDB) getDislikeNumberByPost(post_id int) (int, error) {
 	}
 	return counter, nil
 }
+
+func (m *ConnDB) GetLikeNumberByUser(userId int) (int, error) {
+	statement := `SELECT COUNT(*) FROM LikeDislike WHERE liked=TRUE AND user_id= ?`
+	row := m.DB.QueryRow(statement, userId)
+	var counter int
+	err := row.Scan(&counter)
+	if err != nil {
+		return 0, err
+	}
+	return counter, nil
+}

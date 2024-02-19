@@ -1,10 +1,12 @@
 package models
 
 type User struct {
-	User_id  int
-	Username string
-	Email    string
-	Password string
+	User_id        int
+	Username       string
+	Email          string
+	Password       string
+	LikeCounter    int
+	CommentCounter int
 }
 
 func (m *ConnDB) GetUser(id int) (*User, error) {

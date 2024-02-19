@@ -152,20 +152,21 @@ func (app *application) create(w http.ResponseWriter, r *http.Request) {
 		// la fonction retourne une boolean si donne bonne ou pas
 		categoryIds := r.Form["categorCheck"]
 		content := r.PostForm.Get("content")
+		if len(categoryIds) == 0 || strings.TrimSpace(content) == "" {
+			http.Redirect(w, r, "/create?bad", http.StatusSeeOther)
+			return
+		}
+
 		lastPostId, err := app.connDB.SetPost(content, actualUser)
 		if err != nil {
 			app.serverError(w, err)
 			return
 		}
-		if len(categoryIds) == 0 {
-			http.Redirect(w, r, "/create?bad", http.StatusSeeOther)
-			return
-		}
+		
 		for _, categoryId := range categoryIds {
 			cId, err := strconv.Atoi(strings.TrimSpace(categoryId))
 			if err != nil {
-				// app.clientError(w, http.StatusBadRequest)
-				http.Redirect(w, r, "/create?bad", http.StatusSeeOther)
+				app.clientError(w, http.StatusBadRequest)
 				return
 			}
 			_, err = app.connDB.SetPostCategory(lastPostId, cId)
@@ -174,6 +175,7 @@ func (app *application) create(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		}
+
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 
 	default:

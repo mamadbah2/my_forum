@@ -61,6 +61,7 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, layout, p
 		return
 	}
 	w.WriteHeader(200)
+	
 	//Comme que tout le temps on a le meme user
 	if layout == "base" {
 		userId, err := app.validSession(r)
@@ -70,6 +71,17 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, layout, p
 				app.serverError(w, err)
 				return
 			}
+			userInfo.LikeCounter, err = app.connDB.GetLikeNumberByUser(userId)
+			if err != nil {
+				app.serverError(w, err)
+				return
+			}
+			userInfo.CommentCounter, err = app.connDB.GetCommentNumberByUser(userId)
+			if err != nil {
+				app.serverError(w, err)
+				return
+			}
+
 			data.UserInfo = userInfo
 		}
 	}

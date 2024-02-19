@@ -73,12 +73,12 @@ func main() {
 	app.cacheTemplate = cache
 
 	srv := &http.Server{
-		Addr:     *PORT,
+		Addr:     "0.0.0.0"+*PORT,
 		Handler:  app.routes(),
 		ErrorLog: errorLog,
 	}
 
-	infoLog.Printf("server on http://localhost%s", *PORT)
+	infoLog.Printf("server on http://0.0.0.0%s", *PORT)
 	err = srv.ListenAndServe()
 	errorLog.Fatalln(err.Error())
 }

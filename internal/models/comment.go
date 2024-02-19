@@ -50,6 +50,17 @@ func (m *ConnDB) getCommentNumberByPost(postId int) (int, error) {
 	return nbreComment, nil
 }
 
+func (m *ConnDB) GetCommentNumberByUser(userId int) (int, error) {
+	statement := `SELECT COUNT(*) FROM Comment WHERE user_id = ?`
+	row := m.DB.QueryRow(statement, userId)
+	var nbreComment int
+	err := row.Scan(&nbreComment)
+	if err != nil {
+		return 0, err
+	}
+	return nbreComment, nil
+}
+
 func (m *ConnDB) SetComment(comment string, postId, userId int) (int, error) {
 	statement := `INSERT INTO Comment (comment, date_creation, post_id, user_id)
 	VALUES (?, CURRENT_TIMESTAMP, ?, ?)`

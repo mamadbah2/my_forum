@@ -9,9 +9,13 @@
     {{ else }}
     <h4>{{ .UserInfo.Username }} </h4>
     <p>{{ .UserInfo.Email }} </p>
+    <p><strong>Status </strong> <span class="connected">Connected</span></p>
+    <p>{{ .UserInfo.LikeCounter }} Like(s) <i class="fa-regular fa-thumbs-up"></i></p>
+    <p>{{ .UserInfo.CommentCounter }} Comment(s) <i class="fa-regular fa-comments"></i></p>
     {{end}}
 
 </div>
+
 <nav>
     <span>
         <a href="/create">Ajouter un post</a>
