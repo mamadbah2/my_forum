@@ -125,7 +125,8 @@ my_forum/
 ## 👥 Authors
 
 - **[mamadbah2](https://github.com/mamadbah2)**
-- Contributors: belhadjs, msoumare, edieng
+- **[Kendisec](https://github.com/Kendisec)** 
+- Contributors: belhadjs, msoumare
 
 ## 📝 License
 
